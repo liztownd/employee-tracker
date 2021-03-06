@@ -1,7 +1,6 @@
 const mysql = require('mysql');
 const inquirer = require('inquirer');
 const table = require('console.table');
-//const EmployeeByManager = require('byManager');
 
 const connection = mysql.createConnection({
     host: 'localhost',
@@ -73,28 +72,22 @@ const viewAll = () => {
 
 
       })
-    // SUB QUERY INSIDE THE QUERY?
-  //  console.log("I'm sorry, this function is not available. Please try again.");
-  //  init();
+
 };
 
 
 const viewDept = () => {
-    // JOIN departments & employees
-    // connection.query('SELECT ')
 
     connection.query(`SELECT e.id, e.first_name, e.last_name, r.title, d.dept_name FROM employee as e
     LEFT JOIN role as r
     ON e.role_id = r.id
     JOIN department as d ON r.department_id = d.id`, (err, deptRes) => {
         if (err) throw err;
-      // console.log(deptRes);
         console.table(deptRes);
         init();
 
     })
 
-  //  console.log("I'm sorry, this function is not available. Please try again.");
 
 }
 
@@ -104,21 +97,6 @@ const viewMan = () => {
     console.log("I'm sorry, that function is not available. Please choose something else.");
     init();
 
-    //     connection.query('SELECT * FROM employee', (err, res) => {
-    //         if (err) throw err;
-
-    //         console.log(res);
-
-    //         if (res.manager_id != null) {
-    //             for (let i=0; i<res.length; i++) {
-    //                 if (res.manager_id === id){
-    //                     return `${res.first_name} ${res.last_name}`
-    //                 }
-    //             }
-    //         }
-    //        //  const employee = new EmployeeByManager 
-
-    //     })
 }
 
 const addEmp = () => {
@@ -137,12 +115,6 @@ const addEmp = () => {
             manList.unshift(e.last_name);
             empArray.push(e);
         })
-        // if (empRes.manager_id != null) {
-        // for (let i = 0; i < empRes.length; i++) {
-        //     if (empRes[i].id === empRes.manager_id) {
-        //         manList.unshift(`${empRes[i].last_name}`);
-
-        //     }
        
          })
 
@@ -183,11 +155,6 @@ const addEmp = () => {
         }
 
     ]).then(addRes => {
-        console.table(addRes);
-        console.log(roleArray);
-        console.log(empArray[0].id);
-        // get ids and create employee object
-        // query - insert object 
         let manObj = empArray.find(emp => addRes.manager_name === emp.last_name);
         let roleObj = roleArray.find(role => addRes.role_name === role.title)
 
@@ -200,9 +167,11 @@ const addEmp = () => {
             manager_id: manObj.id
         }, (err => {
             if (err) throw err;
+            console.log('Employee added successfully.')
+            init();
+
         }))
 
-       // init();
     })
 }
 
