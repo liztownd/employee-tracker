@@ -57,7 +57,6 @@ const init = () => {
 };
 
 const viewAll = () => {
-    // JOIN all 3 ugh
       connection.query(`SELECT  e.id, e.first_name, e.last_name, m.first_name as managers_first_name, m.last_name as managers_last_name, r.title, r.salary, d.dept_name
       FROM employeeDB.employee as e
       LEFT JOIN employeeDB.employee as m
@@ -66,7 +65,6 @@ const viewAll = () => {
       ON e.role_id = r.id
       JOIN department as d ON r.department_id = d.id`, (err, allRes) => {
         if (err) throw err;
-       // console.log(allRes);
         console.table(allRes)
         init();
 
@@ -77,7 +75,6 @@ const viewAll = () => {
 
 
 const viewDept = () => {
-
     connection.query(`SELECT e.id, e.first_name, e.last_name, r.title, d.dept_name FROM employee as e
     LEFT JOIN role as r
     ON e.role_id = r.id
@@ -183,10 +180,72 @@ const remEmp = () => {
 
 }
 
-const updateRole = () => {
+
+ const updateRole = () => {
     
-    console.log("I'm sorry, this function is not available. Please try again.");
-    init();
+    let empObjArray = [];
+    let roleObjArray = [];
+    let empArray = [];
+    let roleArray = [];
+    let empUpdateObj = {};
+
+     connection.query('SELECT id, first_name, last_name, role_id FROM employee', (err, res) => {
+        if(err) throw err;
+
+        res.forEach(e => {
+            empObjArray.push(e);
+            empArray.push(`${e.last_name}`)
+        })
+
+        
+        connection.query('SELECT id, title FROM role', (err, roleRes) => {
+            if (err) throw err;
+    
+            roleRes.forEach(e => {
+                roleObjArray.push(e);
+                roleArray.push(`${e.title}`)
+            })
+
+            inquirer.prompt(
+                {
+                    type: 'list',
+                    message: 'What employee would you like to update?',
+                    choices: empArray,
+                    name: 'employee'
+                }
+            ).then(empUpdateRes => {
+                empUpdateObj = empUpdateRes;
+                     inquirer.prompt(
+                         {
+                             type: 'list',
+                             message: 'What role would you like to assign this employee?',
+                             choices: roleArray,
+                             name: 'new_role'
+                         }
+                     )
+                     .then(newRoleRes => {
+                        console.log('b4 loop', newRoleRes, empUpdateObj)
+                        for (let i=0; i<roleObjArray.length; i++){
+                            if (roleObjArray[i].title === newRoleRes.new_role){
+                                for (let j=0; j<empObjArray.length; j++){
+                                    if (empObjArray[j].last_name === empUpdateObj.employee){
+                                        connection.query('UPDATE employee SET role_id = ? WHERE id = ?', [roleObjArray[i].id, empObjArray[j].id], (err, updateRes) => {
+                                            if (err) throw err;
+                                            console.log('New employee role updated successfully!')
+                                            init();
+                                        })
+                
+                                    }
+                                }
+                            }
+                        }
+                    })
+
+            })
+            
+        })//2nd query
+
+    })//1st query
 
 }
 
@@ -199,10 +258,14 @@ const updateMan = () => {
 
 
 const viewRole = () => {
+    connection.query(`SELECT e.id, e.first_name, e.last_name, e.role_id, r.id, r.title FROM employee as e
+    LEFT JOIN role as r
+    ON e.role_id = r.id`, (err, roleRes) => {
+        if (err) throw err;
+        console.table(roleRes);
+        init();
 
-    console.log("I'm sorry, this function is not available. Please try again.");
-    init();
-
+    })
 
 }
 
