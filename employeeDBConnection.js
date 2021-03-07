@@ -224,7 +224,6 @@ const remEmp = () => {
                          }
                      )
                      .then(newRoleRes => {
-                        console.log('b4 loop', newRoleRes, empUpdateObj)
                         for (let i=0; i<roleObjArray.length; i++){
                             if (roleObjArray[i].title === newRoleRes.new_role){
                                 for (let j=0; j<empObjArray.length; j++){
